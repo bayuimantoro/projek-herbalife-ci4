@@ -2,7 +2,7 @@
 
 # Jangan masukan komentar dalam kode
 
-PROJECT_ROOT_DIR="/home/bayu/projek_herbalife_ci4"
+PROJECT_ROOT_DIR="/home/bayu/projek-herbalife-ci4"
 WEB_USER="www-data"    
 PROJECT_OWNER="www-data" # Owner untuk writable, sesuai diskusi terakhir
 
