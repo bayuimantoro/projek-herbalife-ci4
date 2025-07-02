@@ -1,20 +1,3 @@
-<!--
-  ProdukController
- 
-  Controller untuk mengelola data produk dan variannya pada panel admin.
-  Fitur utama yang disediakan:
-  - Menampilkan daftar produk dengan filter pencarian, kategori, dan status.
-  - Menambah produk baru beserta varian-variannya.
-  - Mengedit produk dan varian, termasuk upload dan hapus gambar produk.
-  - Menghapus produk beserta gambar terkait.
-  - Mengaktifkan atau menonaktifkan status produk.
- 
-  Setiap produk dapat memiliki satu atau lebih varian (misal: ukuran, rasa, dsb).
-  Validasi dilakukan baik pada data produk utama maupun data varian.
-  Seluruh operasi simpan/edit produk dan varian dilakukan dalam transaksi database untuk menjaga konsistensi data.
-
-  Digunakan pada aplikasi berbasis CodeIgniter 4.
-  -->
 <?php
 
 namespace App\Controllers\Admin;
