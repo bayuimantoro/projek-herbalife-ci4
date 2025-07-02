@@ -17,7 +17,6 @@ class ProdukController extends BaseController
         $this->produkModel = new ProdukModel();
         $this->produkVarianModel = new ProdukVarianModel();
     }
-
     public function index()
     {
         $keyword = $this->request->getGet('keyword');
