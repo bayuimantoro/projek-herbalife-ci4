@@ -18,7 +18,7 @@ fi
 
 echo "--- Mengatur Izin Direktori Induk agar Nginx dapat Mengakses ---"
 
-# 1. Pastikan /home/sorabi/ memiliki izin eksekusi (dan baca) untuk othersewewwr
+# 1. Pastikan /home/sorabi/ memiliki izin eksekusi (dan baca) untuk other
 # Ini penting agar www-data bisa masuk ke direktori home sorabi
 echo "Mengatur izin untuk /home/bayu/..."
 sudo chmod o+rx /home/bayu/
