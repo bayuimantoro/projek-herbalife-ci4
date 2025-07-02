@@ -1,69 +1,60 @@
-#--------------------------------------------------------------------
-# Example Environment Configuration file
-#
-# This file can be used as a starting point for your own
-# custom .env files, and contains most of the possible settings
-# available in a default install.
-#
-# By default, all of the settings are commented out. If you want
-# to override the setting, you must un-comment it by removing the '#'
-# at the beginning of the line.
-#--------------------------------------------------------------------
+#!/bin/bash
 
-#--------------------------------------------------------------------
-# ENVIRONMENT
-#--------------------------------------------------------------------
+# Jangan masukan komentar dalam kode
 
-CI_ENVIRONMENT = development
+PROJECT_ROOT_DIR="/home/bayu/projek_herbalife_ci4"
+WEB_USER="www-data"    
+PROJECT_OWNER="www-data" # Owner untuk writable, sesuai diskusi terakhir
 
-#--------------------------------------------------------------------
-# APP
-#--------------------------------------------------------------------
+if [[ $EUID -ne 0 ]]; then
+   echo "Script ini harus dijalankan sebagai root atau dengan sudo."
+   exit 1
+fi
 
-# app.baseURL = ''
-# If you have trouble with `.`, you could also use `_`.
-# app_baseURL = ''
-# app.forceGlobalSecureRequests = false
-# app.CSPEnabled = false
+if [ ! -d "$PROJECT_ROOT_DIR" ]; then
+    echo "Error: Direktori proyek '$PROJECT_ROOT_DIR' tidak ditemukan."
+    exit 1
+fi
 
-#--------------------------------------------------------------------
-# DATABASE
-#--------------------------------------------------------------------
+echo "--- Mengatur Izin Direktori Induk agar Nginx dapat Mengakses ---"
 
-database.default.hostname = localhost
-database.default.database = db_herbalife_ci4
-database.default.username = asephs
-database.default.password = hunterz
-database.default.DBDriver = MySQLi
-database.default.DBPrefix =
-database.default.port = 3306
+# 1. Pastikan /home/sorabi/ memiliki izin eksekusi (dan baca) untuk othersewewwr
+# Ini penting agar www-data bisa masuk ke direktori home sorabi
+echo "Mengatur izin untuk /home/bayu/..."
+sudo chmod o+rx /home/bayu/
+# chmod 755 akan memberi rwx untuk owner, r-x untuk group dan others.
+# Ini aman karena tidak memberi izin tulis ke others.
 
-# If you use MySQLi as tests, first update the values of Config\Database::$tests.
-# database.tests.hostname = localhost
-# database.tests.database = ci4_test
-# database.tests.username = root
-# database.tests.password = root
-# database.tests.DBDriver = MySQLi
-# database.tests.DBPrefix =
-# database.tests.charset = utf8mb4
-# database.tests.DBCollat = utf8mb4_general_ci
-# database.tests.port = 3306
+# 2. Pastikan direktori root proyek itu sendiri memiliki izin yang sama
+echo "Mengatur izin untuk $PROJECT_ROOT_DIR..."
+sudo chmod o+rx "$PROJECT_ROOT_DIR"
+# Atau bisa juga: sudo chmod 755 "$PROJECT_ROOT_DIR"
 
-#--------------------------------------------------------------------
-# ENCRYPTION
-#--------------------------------------------------------------------
+# Setelah ini, kita menjalankan kembali bagian permission proyek itu sendiri
+echo "--- Menjalankan kembali pengaturan izin untuk proyek CodeIgniter 4 ---"
 
-# encryption.key =
+cd "$PROJECT_ROOT_DIR" || { echo "Gagal masuk ke direktori proyek."; exit 1; }
 
-#--------------------------------------------------------------------
-# SESSION
-#--------------------------------------------------------------------
+echo "Mengatur kepemilikan direktori 'writable' ke $PROJECT_OWNER:$WEB_USER..."
+sudo chown -R "$PROJECT_OWNER":"$WEB_USER" writable
 
-# session.driver = 'CodeIgniter\Session\Handlers\FileHandler'
-# session.savePath = null
+echo "Memberikan izin tulis untuk user dan grup pada 'writable' (ug+rwx), dan baca/eksekusi untuk 'others' (775/777)..."
+sudo chmod -R ug+rwx writable
+sudo chmod -R o+rx writable
 
-#--------------------------------------------------------------------
-# LOGGER
-#--------------------------------------------------------------------
+echo "Mengatur setgid bit pada 'writable' (g+s)..."
+sudo chmod -R g+s writable
 
-# logger.threshold = 4
+echo "Mengatur izin default untuk file (664) dan direktori (775) lainnya pada seluruh proyek..."
+sudo find . -type f -exec chmod 664 {} \;
+sudo find . -type d -exec chmod 775 {} \;
+
+echo "Memastikan file .env ada..."
+if [ ! -f ".env" ]; then
+    echo "File .env tidak ditemukan. Menyalin dari 'env'..."
+    cp env .env
+    echo "PENTING: Harap edit file .env untuk mengkonfigurasi database, baseURL, dll.!"
+fi
+
+echo "Pengaturan permission untuk deployment CodeIgniter 4 selesai."
+echo "Pastikan konfigurasi web server (Nginx/Apache) sudah menunjuk ke '$PROJECT_ROOT_DIR/public'."
